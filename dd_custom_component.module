@@ -1,0 +1,80 @@
+<?php
+/**
+ * @file
+ * Code for the DD Custom Component feature.
+ */
+
+include_once 'dd_custom_component.features.inc';
+
+/**
+ * Implements hook_preprocess() for fieldable_panels_pane of custom component.
+ */
+function dd_custom_component_preprocess_fieldable_panels_pane(&$variables) {
+  if ($variables['elements']['#bundle'] != 'dd_custom_component') {
+    return;
+  }
+  $element = $variables['elements']['#fieldable_panels_pane'];
+
+  // Add javascript files defined in FPP.
+  if (!empty($element->field_javascript_files)) {
+    foreach ($element->field_javascript_files[LANGUAGE_NONE] as $file) {
+      $path = file_create_url($file['uri']);
+      drupal_add_js($path,
+        array(
+          'type' => 'file',
+          'every_page' => FALSE,
+          'preprocess' => FALSE,
+          'group' => JS_THEME,
+          'weight' => 1000,
+        ));
+    }
+  }
+  // Add CSS files defined in FPP.
+  if (!empty($element->field_css_files)) {
+    foreach ($element->field_css_files[LANGUAGE_NONE] as $file) {
+      $path = file_create_url($file['uri']);
+      drupal_add_css($path,
+        array(
+          'type' => 'file',
+          'every_page' => FALSE,
+          'preprocess' => FALSE,
+          'group' => CSS_THEME,
+          'weight' => 1000,
+        ));
+    }
+  }
+  // Add inline CSS and javascript code defined in FPP.
+  $custom_js = !empty($element->field_custom_javascript) ? $element->field_custom_javascript[LANGUAGE_NONE][0]['value'] : '';
+  $custom_css = !empty($element->field_custom_css) ? $element->field_custom_css[LANGUAGE_NONE][0]['value'] : '';
+  if (!empty($custom_js)) {
+    $custom_js = "(function ($, Drupal, window, document, undefined) {\n$custom_js\n})(jQuery, Drupal, this, this.document);";
+    drupal_add_js($custom_js,
+      array(
+        'type' => 'inline',
+        'every_page' => FALSE,
+        'group' => JS_THEME,
+        'weight' => 2000,
+      ));
+  }
+  if (!empty($custom_css)) {
+    drupal_add_css($custom_css,
+      array(
+        'type' => 'inline',
+        'every_page' => FALSE,
+        'group' => CSS_THEME,
+        'weight' => 2000,
+      ));
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Alter the fieldable_panels_panes_entity_edit_form forms.
+ */
+function dd_custom_component_form_fieldable_panels_panes_entity_edit_form_alter(&$form, &$form_state, $form_id) {
+  // Disable wysiwyg editor on html markup field.
+  if ($form['#entity']->bundle == 'dd_custom_component') {
+    $form['field_html'][LANGUAGE_NONE][0]['#wysiwyg'] = FALSE;
+  }
+}
