@@ -47,7 +47,7 @@ function dd_custom_component_preprocess_fieldable_panels_pane(&$variables) {
   $custom_js = !empty($element->field_custom_javascript) ? $element->field_custom_javascript[LANGUAGE_NONE][0]['value'] : '';
   $custom_css = !empty($element->field_custom_css) ? $element->field_custom_css[LANGUAGE_NONE][0]['value'] : '';
   if (!empty($custom_js)) {
-    $custom_js = "(function ($, Drupal, window, document, undefined) {\n$custom_js\n})(jQuery, Drupal, this, this.document);";
+    $custom_js = "// Added via dd_custom_component FPID: {$element->fpid}.\n(function ($, Drupal, window, document, undefined) {\n$custom_js\n})(jQuery, Drupal, this, this.document);";
     drupal_add_js($custom_js,
       array(
         'type' => 'inline',
@@ -57,6 +57,7 @@ function dd_custom_component_preprocess_fieldable_panels_pane(&$variables) {
       ));
   }
   if (!empty($custom_css)) {
+    $custom_css = "<!-- Added via dd_custom_component FPID: {$element->fpid}. -->\n{$custom_css}";
     drupal_add_css($custom_css,
       array(
         'type' => 'inline',
