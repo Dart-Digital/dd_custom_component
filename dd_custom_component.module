@@ -57,7 +57,7 @@ function dd_custom_component_preprocess_fieldable_panels_pane(&$variables) {
       ));
   }
   if (!empty($custom_css)) {
-    $custom_css = "<!-- Added via dd_custom_component FPID: {$element->fpid}. -->\n{$custom_css}";
+    $custom_css = "/* Added via dd_custom_component FPID: {$element->fpid}. */\n{$custom_css}";
     drupal_add_css($custom_css,
       array(
         'type' => 'inline',
